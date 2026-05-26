@@ -1,0 +1,34 @@
+type Card {
+  id: ID!
+  title: String!
+  pipeId: Int!
+  fields: [CardField!]!
+}
+
+type CardField {
+  fieldId: String!
+  fieldValue: String!
+}
+
+input FieldAttributeInput {
+  fieldId: String!
+  fieldValue: String!
+}
+
+input CreateCardInput {
+  pipeId: Int!
+  title: String!
+  fieldsAttributes: [FieldAttributeInput!]!
+}
+
+type CreatedCard {
+  title: String!
+}
+
+type CreateCardPayload {
+  card: CreatedCard!
+}
+
+type Mutation {
+  createCard(input: CreateCardInput!): CreateCardPayload!
+}
