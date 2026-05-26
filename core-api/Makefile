@@ -62,3 +62,18 @@ watch:
         fi
 
 .PHONY: all build run test clean watch docker-run docker-down itest
+
+migrate-create:
+	@echo "Creating migration..."
+	@migrate create -ext sql -dir services/database/migrations -seq $(name)
+
+migrate-up:
+	@echo "Running migrations..."
+	@set -a && . ./.env && set +a && \
+	migrate -path services/database/migrations \
+		-database "postgres://$$DB_USERNAME:$$DB_PASSWORD@$$DB_HOST:$$DB_PORT/$$DB_DATABASE?sslmode=disable&search_path=$$DB_SCHEMA" \
+		up
+
+queries-generate:
+	@echo "Generating types..."
+	@sqlc generate -f services/database/sqlc.yaml
