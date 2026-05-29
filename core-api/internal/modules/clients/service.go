@@ -11,14 +11,6 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type clientRepositoryInterface interface {
-	CreateClient(ctx context.Context, client *Client) (*Client, error)
-}
-
-type clientPipefyInterface interface {
-	CreateCard(ctx context.Context, dto *pipefy.CreateCardDto) (*pipefy.Card, error)
-}
-
 type ClientService struct {
 	repository clientRepositoryInterface
 	pipefy     clientPipefyInterface
