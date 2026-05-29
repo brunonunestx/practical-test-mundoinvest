@@ -11,5 +11,28 @@ services:
     volumes:
       - psql_volume_bp:/var/lib/postgresql/data
 
+  api:
+    build: ./core-api
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: "postgres://${DB_USERNAME}:${DB_PASSWORD}@psql_bp:5432/${DB_DATABASE}?sslmode=disable"
+      PIPEFY_API_URL: "http://mock-pipefy:8001/query"
+      PIPEFY_API_TOKEN: ${PIPEFY_API_TOKEN}
+      PIPE_ID: ${PIPE_ID}
+      PORT: ${PORT}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - psql_bp
+      - mock-pipefy
+
+  mock-pipefy:
+    build: ./mock/mock-pipefy-api
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    environment:
+      PORT: 8001
+  
 volumes:
   psql_volume_bp:
