@@ -19,7 +19,19 @@ API REST em Go que integra com o Pipefy para criação de clientes e processamen
 - [Docker](https://docs.docker.com/get-docker/) e Docker Compose
 - [`migrate`](https://github.com/golang-migrate/migrate) (para rodar migrations manualmente)
 
-### 1. Variáveis de ambiente
+### 1. Instalar golang-migrate
+
+```bash
+go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+```
+
+Confirme a instalação:
+
+```bash
+migrate -version
+```
+
+### 2. Variáveis de ambiente
 
 ```bash
 cp .env.example .env
@@ -27,7 +39,7 @@ cp .env.example .env
 
 Edite o `.env` conforme necessário. Valores padrão funcionam para desenvolvimento local com Docker.
 
-### 2. Subir com Docker Compose (recomendado)
+### 3. Subir com Docker Compose (recomendado)
 
 Sobe a API, o banco PostgreSQL e o mock do Pipefy juntos:
 
@@ -37,7 +49,7 @@ docker compose up --build
 
 A API ficará disponível em `http://localhost:8080`.
 
-### 3. Rodar apenas o banco e o mock via Docker
+### 4. Rodar apenas o banco e o mock via Docker
 
 ```bash
 docker compose up psql_bp mock-pipefy
@@ -51,7 +63,7 @@ make migrate-up             # aplica as migrations
 make run                    # inicia a API
 ```
 
-### 4. Live reload (desenvolvimento)
+### 5. Live reload (desenvolvimento)
 
 Requer [`air`](https://github.com/air-verse/air):
 
