@@ -33,6 +33,10 @@ jobs:
         with:
           go-version-file: core-api/go.mod
 
+      - name: Pin go directive for lint compatibility
+        working-directory: core-api
+        run: go mod edit -go=1.24.0
+
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
