@@ -17,7 +17,7 @@ type ClientService struct {
 	pipeId     int
 }
 
-func NewClientService(pool *pgxpool.Pool, pipefy *pipefy.PipefyService) *ClientService {
+func NewClientService(pool *pgxpool.Pool, pipefy pipefy.Provider) *ClientService {
 	cfg := config.Load()
 	return &ClientService{
 		repository: NewClientRepository(pool),

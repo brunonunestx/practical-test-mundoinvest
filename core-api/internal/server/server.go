@@ -18,7 +18,14 @@ import (
 type Server struct {
 	port   int
 	pool   *pgxpool.Pool
-	pipefy *pipefy.PipefyService
+	pipefy pipefy.Provider
+}
+
+func NewServerWithDeps(pool *pgxpool.Pool, pipefySvc pipefy.Provider) *Server {
+	return &Server{
+		pool:   pool,
+		pipefy: pipefySvc,
+	}
 }
 
 func NewServer() *http.Server {

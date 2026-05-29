@@ -20,7 +20,7 @@ type Handler struct {
 	service cardServiceInterface
 }
 
-func NewHandler(pool *pgxpool.Pool, pipefy *pipefy.PipefyService) *Handler {
+func NewHandler(pool *pgxpool.Pool, pipefy pipefy.Provider) *Handler {
 	return &Handler{service: NewService(pool, pipefy)}
 }
 

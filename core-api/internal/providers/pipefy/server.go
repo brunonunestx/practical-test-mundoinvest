@@ -10,6 +10,11 @@ import (
 	"core-api/internal/providers/config"
 )
 
+type Provider interface {
+	CreateCard(ctx context.Context, dto *CreateCardDto) (*Card, error)
+	UpdateCardFields(ctx context.Context, dto *UpdateCardDto) error
+}
+
 type PipefyService struct{}
 
 func NewPipefyService() *PipefyService {

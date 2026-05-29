@@ -22,7 +22,7 @@ type ClientHandler struct {
 	validator *validator.Validate
 }
 
-func NewClientHandler(pool *pgxpool.Pool, pipefyService *pipefy.PipefyService) *ClientHandler {
+func NewClientHandler(pool *pgxpool.Pool, pipefyService pipefy.Provider) *ClientHandler {
 	return &ClientHandler{
 		service:   NewClientService(pool, pipefyService),
 		validator: httputil.NewValidator(),

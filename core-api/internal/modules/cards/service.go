@@ -15,7 +15,7 @@ type Service struct {
 	pipefy     cardPipefyInterface
 }
 
-func NewService(pool *pgxpool.Pool, pipefySvc *pipefy.PipefyService) *Service {
+func NewService(pool *pgxpool.Pool, pipefySvc pipefy.Provider) *Service {
 	return &Service{
 		repository: NewRepository(pool),
 		pipefy:     pipefySvc,
