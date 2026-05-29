@@ -3,6 +3,7 @@ package server
 import (
 	"net/http"
 
+	"core-api/internal/modules/cards"
 	"core-api/internal/modules/clients"
 
 	"github.com/gorilla/mux"
@@ -10,12 +11,14 @@ import (
 
 func (s *Server) RegisterRoutes() http.Handler {
 	clientsHandler := clients.NewClientHandler(s.pool, s.pipefy)
+	cardsHandler := cards.NewHandler(s.pool, s.pipefy)
 
 	r := mux.NewRouter()
 
 	r.Use(s.corsMiddleware)
 
 	r.HandleFunc("/clients", clientsHandler.CreateClient).Methods("POST")
+	r.HandleFunc("/webhooks/pipefy/card-updated", cardsHandler.UpdateCard).Methods("POST")
 
 	return r
 }

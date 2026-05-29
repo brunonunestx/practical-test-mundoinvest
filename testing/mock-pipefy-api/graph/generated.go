@@ -57,15 +57,21 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateCard func(childComplexity int, input model.CreateCardInput) int
+		CreateCard         func(childComplexity int, input model.CreateCardInput) int
+		UpdateFieldsValues func(childComplexity int, input model.UpdateFieldsValuesInput) int
 	}
 
 	Query struct {
+	}
+
+	UpdateFieldsValuesPayload struct {
+		Success func(childComplexity int) int
 	}
 }
 
 type MutationResolver interface {
 	CreateCard(ctx context.Context, input model.CreateCardInput) (*model.CreateCardPayload, error)
+	UpdateFieldsValues(ctx context.Context, input model.UpdateFieldsValuesInput) (*model.UpdateFieldsValuesPayload, error)
 }
 
 type executableSchema graphql.ExecutableSchemaState[ResolverRoot, DirectiveRoot, ComplexityRoot]
@@ -145,6 +151,24 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Mutation.CreateCard(childComplexity, args["input"].(model.CreateCardInput)), true
+	case "Mutation.updateFieldsValues":
+		if e.ComplexityRoot.Mutation.UpdateFieldsValues == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateFieldsValues_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Mutation.UpdateFieldsValues(childComplexity, args["input"].(model.UpdateFieldsValuesInput)), true
+
+	case "UpdateFieldsValuesPayload.success":
+		if e.ComplexityRoot.UpdateFieldsValuesPayload.Success == nil {
+			break
+		}
+
+		return e.ComplexityRoot.UpdateFieldsValuesPayload.Success(childComplexity), true
 
 	}
 	return 0, false
@@ -156,6 +180,8 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputCreateCardInput,
 		ec.unmarshalInputFieldAttributeInput,
+		ec.unmarshalInputFieldValueInput,
+		ec.unmarshalInputUpdateFieldsValuesInput,
 	)
 	first := true
 
@@ -274,6 +300,14 @@ func (ec *executionContext) childFields_CreatedCard(ctx context.Context, field g
 		return ec.fieldContext_CreatedCard_title(ctx, field)
 	}
 	return nil, fmt.Errorf("no field named %q was found under type CreatedCard", field.Name)
+}
+
+func (ec *executionContext) childFields_UpdateFieldsValuesPayload(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+	switch field.Name {
+	case "success":
+		return ec.fieldContext_UpdateFieldsValuesPayload_success(ctx, field)
+	}
+	return nil, fmt.Errorf("no field named %q was found under type UpdateFieldsValuesPayload", field.Name)
 }
 
 func (ec *executionContext) childFields___Directive(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
@@ -398,6 +432,20 @@ func (ec *executionContext) field_Mutation_createCard_args(ctx context.Context, 
 	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input",
 		func(ctx context.Context, v any) (model.CreateCardInput, error) {
 			return ec.unmarshalNCreateCardInput2mockᚑpipefyᚑapiᚋgraphᚋmodelᚐCreateCardInput(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateFieldsValues_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input",
+		func(ctx context.Context, v any) (model.UpdateFieldsValuesInput, error) {
+			return ec.unmarshalNUpdateFieldsValuesInput2mockᚑpipefyᚑapiᚋgraphᚋmodelᚐUpdateFieldsValuesInput(ctx, v)
 		})
 	if err != nil {
 		return nil, err
@@ -730,6 +778,50 @@ func (ec *executionContext) fieldContext_Mutation_createCard(ctx context.Context
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_updateFieldsValues(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Mutation_updateFieldsValues(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Mutation().UpdateFieldsValues(ctx, fc.Args["input"].(model.UpdateFieldsValuesInput))
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *model.UpdateFieldsValuesPayload) graphql.Marshaler {
+			return ec.marshalNUpdateFieldsValuesPayload2ᚖmockᚑpipefyᚑapiᚋgraphᚋmodelᚐUpdateFieldsValuesPayload(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Mutation_updateFieldsValues(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_UpdateFieldsValuesPayload(ctx, field)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateFieldsValues_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -804,6 +896,29 @@ func (ec *executionContext) fieldContext_Query___schema(_ context.Context, field
 		},
 	}
 	return fc, nil
+}
+
+func (ec *executionContext) _UpdateFieldsValuesPayload_success(ctx context.Context, field graphql.CollectedField, obj *model.UpdateFieldsValuesPayload) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_UpdateFieldsValuesPayload_success(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.Success, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v bool) graphql.Marshaler {
+			return ec.marshalNBoolean2bool(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_UpdateFieldsValuesPayload_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("UpdateFieldsValuesPayload", field, false, false, errors.New("field of type Boolean does not have child fields"))
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -1946,6 +2061,80 @@ func (ec *executionContext) unmarshalInputFieldAttributeInput(ctx context.Contex
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputFieldValueInput(ctx context.Context, obj any) (model.FieldValueInput, error) {
+	var it model.FieldValueInput
+	if obj == nil {
+		return it, nil
+	}
+
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"fieldId", "value"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "fieldId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fieldId"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.FieldID = data
+		case "value":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("value"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Value = data
+		}
+	}
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateFieldsValuesInput(ctx context.Context, obj any) (model.UpdateFieldsValuesInput, error) {
+	var it model.UpdateFieldsValuesInput
+	if obj == nil {
+		return it, nil
+	}
+
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"nodeId", "values"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "nodeId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nodeId"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NodeID = data
+		case "values":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("values"))
+			data, err := ec.unmarshalNFieldValueInput2ᚕᚖmockᚑpipefyᚑapiᚋgraphᚋmodelᚐFieldValueInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Values = data
+		}
+	}
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -2156,6 +2345,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "updateFieldsValues":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateFieldsValues(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2206,6 +2402,45 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___schema(ctx, field)
 			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(min(len(deferred), math.MaxInt32)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var updateFieldsValuesPayloadImplementors = []string{"UpdateFieldsValuesPayload"}
+
+func (ec *executionContext) _UpdateFieldsValuesPayload(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateFieldsValuesPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateFieldsValuesPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateFieldsValuesPayload")
+		case "success":
+			out.Values[i] = ec._UpdateFieldsValuesPayload_success(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2655,6 +2890,26 @@ func (ec *executionContext) unmarshalNFieldAttributeInput2ᚖmockᚑpipefyᚑapi
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNFieldValueInput2ᚕᚖmockᚑpipefyᚑapiᚋgraphᚋmodelᚐFieldValueInputᚄ(ctx context.Context, v any) ([]*model.FieldValueInput, error) {
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]*model.FieldValueInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNFieldValueInput2ᚖmockᚑpipefyᚑapiᚋgraphᚋmodelᚐFieldValueInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNFieldValueInput2ᚖmockᚑpipefyᚑapiᚋgraphᚋmodelᚐFieldValueInput(ctx context.Context, v any) (*model.FieldValueInput, error) {
+	res, err := ec.unmarshalInputFieldValueInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNID2string(ctx context.Context, v any) (string, error) {
 	res, err := graphql.UnmarshalID(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -2701,6 +2956,25 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNUpdateFieldsValuesInput2mockᚑpipefyᚑapiᚋgraphᚋmodelᚐUpdateFieldsValuesInput(ctx context.Context, v any) (model.UpdateFieldsValuesInput, error) {
+	res, err := ec.unmarshalInputUpdateFieldsValuesInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUpdateFieldsValuesPayload2mockᚑpipefyᚑapiᚋgraphᚋmodelᚐUpdateFieldsValuesPayload(ctx context.Context, sel ast.SelectionSet, v model.UpdateFieldsValuesPayload) graphql.Marshaler {
+	return ec._UpdateFieldsValuesPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUpdateFieldsValuesPayload2ᚖmockᚑpipefyᚑapiᚋgraphᚋmodelᚐUpdateFieldsValuesPayload(ctx context.Context, sel ast.SelectionSet, v *model.UpdateFieldsValuesPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UpdateFieldsValuesPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {

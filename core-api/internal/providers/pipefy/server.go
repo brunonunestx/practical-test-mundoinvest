@@ -41,3 +41,24 @@ func (s *PipefyService) CreateCard(ctx context.Context, dto *CreateCardDto) (*Ca
 
 	return nil, nil
 }
+
+func (s *PipefyService) UpdateCardFields(ctx context.Context, dto *UpdateCardDto) error {
+	cfg := config.Load()
+	mutation := BuildUpdateCardFieldsMutation(dto.NodeId, dto.FieldsAttributes)
+
+	fmt.Printf("Sending mutation to Pipefy: %s\n", mutation)
+
+	body, err := json.Marshal(graphQLRequest{Query: mutation})
+	if err != nil {
+		return err
+	}
+
+	resp, err := http.Post(cfg.PipefyApiUrl, "application/json", bytes.NewBuffer(body))
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+
+	return nil
+}

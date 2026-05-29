@@ -26,7 +26,39 @@ func (r *mutationResolver) CreateCard(ctx context.Context, input model.CreateCar
 	}, nil
 }
 
+// UpdateFieldsValues is the resolver for the updateFieldsValues field.
+func (r *mutationResolver) UpdateFieldsValues(ctx context.Context, input model.UpdateFieldsValuesInput) (*model.UpdateFieldsValuesPayload, error) {
+	fmt.Println("Updating card: nodeId=", input.NodeID)
+	for _, f := range input.Values {
+		fmt.Printf("  field: %s = %s\n", f.FieldID, f.Value)
+	}
+
+	return &model.UpdateFieldsValuesPayload{
+		Success: true,
+	}, nil
+}
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
 type mutationResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+/*
+	func (r *mutationResolver) UpdateCard(ctx context.Context, input model.UpdateCardInput) (*model.UpdateCardPayload, error) {
+	fmt.Println("Updating card: id=", input.ID)
+	for _, f := range input.FieldsAttributes {
+		fmt.Printf("  field: %s = %s\n", f.FieldID, f.FieldValue)
+	}
+	return &model.UpdateCardPayload{
+		Card: &model.CreatedCard{
+			Title: "Updated Card",
+		},
+	}, nil
+}
+*/

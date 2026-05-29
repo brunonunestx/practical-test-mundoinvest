@@ -33,8 +33,22 @@ type FieldAttributeInput struct {
 	FieldValue string `json:"fieldValue"`
 }
 
+type FieldValueInput struct {
+	FieldID string `json:"fieldId"`
+	Value   string `json:"value"`
+}
+
 type Mutation struct {
 }
 
 type Query struct {
+}
+
+type UpdateFieldsValuesInput struct {
+	NodeID string             `json:"nodeId"`
+	Values []*FieldValueInput `json:"values"`
+}
+
+type UpdateFieldsValuesPayload struct {
+	Success bool `json:"success"`
 }

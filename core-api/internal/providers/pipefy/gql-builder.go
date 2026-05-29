@@ -13,3 +13,15 @@ func BuildCreateCardMutation(dto *CreateCardDto) string {
 
 	return mutation
 }
+
+func BuildUpdateCardFieldsMutation(nodeId string, fields []FieldAttribute) string {
+	mutation := fmt.Sprintf("mutation { updateFieldsValues(input: { nodeId: \"%s\", values: [", nodeId)
+
+	for _, field := range fields {
+		mutation += fmt.Sprintf("{ fieldId: \"%s\", value: \"%s\" },", field.FieldId, field.Value)
+	}
+
+	mutation += "] }) { success } }"
+
+	return mutation
+}

@@ -107,3 +107,13 @@ type Client struct {
 	UpdatedAt   pgtype.Timestamptz
 	Amount      int32
 }
+
+type Event struct {
+	ID          pgtype.UUID
+	EventID     string
+	CardID      string
+	ClientEmail string
+	Timestamp   pgtype.Timestamptz
+	CreatedAt   pgtype.Timestamptz
+	UpdatedAt   pgtype.Timestamptz
+}

@@ -76,3 +76,53 @@ func (q *Queries) CreateClient(ctx context.Context, arg CreateClientParams) (Cre
 	)
 	return i, err
 }
+
+const getClientByEmail = `-- name: GetClientByEmail :one
+SELECT id, name, email, request_type, status, priority, created_at, updated_at, amount FROM "Clients" WHERE email = $1
+`
+
+func (q *Queries) GetClientByEmail(ctx context.Context, email string) (Client, error) {
+	row := q.db.QueryRow(ctx, getClientByEmail, email)
+	var i Client
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Email,
+		&i.RequestType,
+		&i.Status,
+		&i.Priority,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Amount,
+	)
+	return i, err
+}
+
+const updateClientStatus = `-- name: UpdateClientStatus :one
+UPDATE "Clients"
+SET status = $2, updated_at = NOW()
+WHERE email = $1
+RETURNING id, name, email, request_type, status, priority, created_at, updated_at, amount
+`
+
+type UpdateClientStatusParams struct {
+	Email  string
+	Status RequestStatusEnum
+}
+
+func (q *Queries) UpdateClientStatus(ctx context.Context, arg UpdateClientStatusParams) (Client, error) {
+	row := q.db.QueryRow(ctx, updateClientStatus, arg.Email, arg.Status)
+	var i Client
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Email,
+		&i.RequestType,
+		&i.Status,
+		&i.Priority,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Amount,
+	)
+	return i, err
+}

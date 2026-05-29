@@ -17,3 +17,8 @@ type CreateCardDto struct {
 	Title            string           `json:"title"`
 	FieldsAttributes []FieldAttribute `json:"fieldsAttributes"`
 }
+
+type UpdateCardDto struct {
+	NodeId           string           `json:"nodeId"`
+	FieldsAttributes []FieldAttribute `json:"fieldsAttributes"`
+}

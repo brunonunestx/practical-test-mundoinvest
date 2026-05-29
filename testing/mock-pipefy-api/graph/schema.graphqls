@@ -21,6 +21,16 @@ input CreateCardInput {
   fieldsAttributes: [FieldAttributeInput!]!
 }
 
+input FieldValueInput {
+  fieldId: String!
+  value: String!
+}
+
+input UpdateFieldsValuesInput {
+  nodeId: ID!
+  values: [FieldValueInput!]!
+}
+
 type CreatedCard {
   title: String!
 }
@@ -29,6 +39,11 @@ type CreateCardPayload {
   card: CreatedCard!
 }
 
+type UpdateFieldsValuesPayload {
+  success: Boolean!
+}
+
 type Mutation {
   createCard(input: CreateCardInput!): CreateCardPayload!
+  updateFieldsValues(input: UpdateFieldsValuesInput!): UpdateFieldsValuesPayload!
 }

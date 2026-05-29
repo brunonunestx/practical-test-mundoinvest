@@ -51,6 +51,8 @@ func (s *ClientService) CreateClient(ctx context.Context, dto *CreateClientDto) 
 			{FieldId: "email", Value: dto.Email},
 			{FieldId: "tipo_cliente", Value: dto.ClientType},
 			{FieldId: "valor_patrimonio", Value: fmt.Sprintf("%g", dto.Value)},
+			{FieldId: "prioridade", Value: priority},
+			{FieldId: "status", Value: "Aguardando Análise"},
 		},
 	})
 	if err != nil {
