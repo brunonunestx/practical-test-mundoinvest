@@ -11,15 +11,26 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+type clientRepositoryInterface interface {
+	CreateClient(ctx context.Context, client *Client) (*Client, error)
+}
+
+type clientPipefyInterface interface {
+	CreateCard(ctx context.Context, dto *pipefy.CreateCardDto) (*pipefy.Card, error)
+}
+
 type ClientService struct {
-	repository *ClientRepository
-	pipefy     *pipefy.PipefyService
+	repository clientRepositoryInterface
+	pipefy     clientPipefyInterface
+	pipeId     int
 }
 
 func NewClientService(pool *pgxpool.Pool, pipefy *pipefy.PipefyService) *ClientService {
+	cfg := config.Load()
 	return &ClientService{
 		repository: NewClientRepository(pool),
 		pipefy:     pipefy,
+		pipeId:     cfg.PipeId,
 	}
 }
 
@@ -41,10 +52,8 @@ func (s *ClientService) CreateClient(ctx context.Context, dto *CreateClientDto) 
 		return nil, err
 	}
 
-	cfg := config.Load()
-
 	_, err = s.pipefy.CreateCard(ctx, &pipefy.CreateCardDto{
-		PipeId: cfg.PipeId,
+		PipeId: s.pipeId,
 		Title:  dto.Email,
 		FieldsAttributes: []pipefy.FieldAttribute{
 			{FieldId: "nome", Value: dto.Name},
@@ -58,8 +67,6 @@ func (s *ClientService) CreateClient(ctx context.Context, dto *CreateClientDto) 
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println(createdUser)
 
 	return createdUser, nil
 }

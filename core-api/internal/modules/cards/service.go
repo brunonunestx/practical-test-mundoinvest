@@ -6,19 +6,31 @@ import (
 
 	"core-api/internal/providers/pipefy"
 	pkg "core-api/packages"
+	db "core-api/services/database/generated"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type Service struct {
-	repository *Repository
-	pipefy     *pipefy.PipefyService
+type repositoryInterface interface {
+	GetEventsByClientEmail(ctx context.Context, email string) ([]db.Event, error)
+	RegisterEvent(ctx context.Context, dto *CardUpdateDto) (db.Event, error)
+	GetClientByEmail(ctx context.Context, email string) (db.Client, error)
+	UpdateClientStatus(ctx context.Context, email string, status string) (db.Client, error)
 }
 
-func NewService(pool *pgxpool.Pool, pipefy *pipefy.PipefyService) *Service {
+type pipefyInterface interface {
+	UpdateCardFields(ctx context.Context, dto *pipefy.UpdateCardDto) error
+}
+
+type Service struct {
+	repository repositoryInterface
+	pipefy     pipefyInterface
+}
+
+func NewService(pool *pgxpool.Pool, pipefySvc *pipefy.PipefyService) *Service {
 	return &Service{
 		repository: NewRepository(pool),
-		pipefy:     pipefy,
+		pipefy:     pipefySvc,
 	}
 }
 
