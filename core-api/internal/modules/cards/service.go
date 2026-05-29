@@ -11,8 +11,8 @@ import (
 )
 
 type Service struct {
-	repository repositoryInterface
-	pipefy     pipefyInterface
+	repository cardRepositoryInterface
+	pipefy     cardPipefyInterface
 }
 
 func NewService(pool *pgxpool.Pool, pipefySvc *pipefy.PipefyService) *Service {

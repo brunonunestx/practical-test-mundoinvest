@@ -9,7 +9,7 @@ import (
 	db "core-api/services/database/generated"
 )
 
-func NewServiceTest(repo repositoryInterface, pip pipefyInterface) *Service {
+func NewServiceTest(repo cardRepositoryInterface, pip cardPipefyInterface) *Service {
 	return &Service{repository: repo, pipefy: pip}
 }
 

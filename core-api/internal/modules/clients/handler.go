@@ -1,6 +1,7 @@
 package clients
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -12,8 +13,12 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+type clientServiceInterface interface {
+	CreateClient(ctx context.Context, dto *CreateClientDto) (*Client, error)
+}
+
 type ClientHandler struct {
-	service   *ClientService
+	service   clientServiceInterface
 	validator *validator.Validate
 }
 

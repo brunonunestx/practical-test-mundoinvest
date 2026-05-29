@@ -1,6 +1,7 @@
 package cards
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -11,8 +12,12 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+type cardServiceInterface interface {
+	UpdateCard(ctx context.Context, dto *CardUpdateDto) error
+}
+
 type Handler struct {
-	service *Service
+	service cardServiceInterface
 }
 
 func NewHandler(pool *pgxpool.Pool, pipefy *pipefy.PipefyService) *Handler {
