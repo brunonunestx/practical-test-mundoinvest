@@ -30,7 +30,7 @@ func NewValidator() *validator.Validate {
 func WriteJSON(w http.ResponseWriter, status int, body any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-	json.NewEncoder(w).Encode(body)
+	_ = json.NewEncoder(w).Encode(body)
 }
 
 func ValidationErrors(err error) (map[string]string, bool) {

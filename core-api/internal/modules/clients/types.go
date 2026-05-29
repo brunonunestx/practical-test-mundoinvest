@@ -1,7 +1,6 @@
 package clients
 
 type Client struct {
-	id            int
 	name          string
 	email         string
 	clientType    string

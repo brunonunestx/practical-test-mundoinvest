@@ -1,11 +1,6 @@
 package pipefy
 
-type Card struct {
-	id     string
-	title  string
-	pipeId int
-	fields []FieldAttribute
-}
+type Card struct{}
 
 type FieldAttribute struct {
 	FieldId string
