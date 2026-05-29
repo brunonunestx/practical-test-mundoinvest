@@ -3,7 +3,6 @@ package clients
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"core-api/internal/providers/pipefy"
@@ -48,7 +47,7 @@ func (h *ClientHandler) CreateClient(w http.ResponseWriter, r *http.Request) {
 
 	client, err := h.service.CreateClient(r.Context(), &dto)
 	if err != nil {
-		fmt.Printf("Error creating client: %v\n", err)
+		httputil.Logger(r.Context()).Error("create client failed", "error", err)
 		httputil.WriteJSON(w, http.StatusInternalServerError, map[string]string{"error": "failed to create client"})
 		return
 	}

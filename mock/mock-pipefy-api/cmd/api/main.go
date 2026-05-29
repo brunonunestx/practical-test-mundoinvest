@@ -1,13 +1,19 @@
 package main
 
-import "mock-pipefy-api/internal/server"
+import (
+	"log/slog"
+	"os"
+
+	"mock-pipefy-api/internal/server"
+)
 
 func main() {
-	println("Mock Pipefy API is running...")
+	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
 
-	defer println("Mock Pipefy API stopped.")
+	slog.Info("mock pipefy api starting")
+	defer slog.Info("mock pipefy api stopped")
 
 	if err := server.Init().Start(); err != nil {
-		println("Error starting Mock Pipefy API:", err.Error())
+		slog.Error("mock pipefy api failed", "error", err)
 	}
 }

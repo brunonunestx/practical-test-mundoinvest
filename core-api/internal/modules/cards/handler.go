@@ -3,7 +3,6 @@ package cards
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"core-api/internal/providers/pipefy"
@@ -42,7 +41,7 @@ func (h *Handler) UpdateCard(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.service.UpdateCard(r.Context(), &dto); err != nil {
-		fmt.Printf("Error updating card: %v\n", err)
+		httputil.Logger(r.Context()).Error("update card failed", "event_id", dto.EventID, "card_id", dto.CardID, "error", err)
 		httputil.WriteJSON(w, http.StatusInternalServerError, map[string]string{"error": "failed to update card"})
 		return
 	}

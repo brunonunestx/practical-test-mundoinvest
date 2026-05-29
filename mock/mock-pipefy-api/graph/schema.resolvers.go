@@ -7,16 +7,16 @@ package graph
 
 import (
 	"context"
-	"fmt"
+	"log/slog"
 
 	"mock-pipefy-api/graph/model"
 )
 
 // CreateCard is the resolver for the createCard field.
 func (r *mutationResolver) CreateCard(ctx context.Context, input model.CreateCardInput) (*model.CreateCardPayload, error) {
-	fmt.Printf("Creating card: pipeId=%d title=%s\n", input.PipeID, input.Title)
+	slog.InfoContext(ctx, "create card received", "pipe_id", input.PipeID, "title", input.Title, "fields_count", len(input.FieldsAttributes))
 	for _, f := range input.FieldsAttributes {
-		fmt.Printf("  field: %s = %s\n", f.FieldID, f.FieldValue)
+		slog.DebugContext(ctx, "create card field", "field_id", f.FieldID, "value", f.FieldValue)
 	}
 
 	return &model.CreateCardPayload{
@@ -28,9 +28,9 @@ func (r *mutationResolver) CreateCard(ctx context.Context, input model.CreateCar
 
 // UpdateFieldsValues is the resolver for the updateFieldsValues field.
 func (r *mutationResolver) UpdateFieldsValues(ctx context.Context, input model.UpdateFieldsValuesInput) (*model.UpdateFieldsValuesPayload, error) {
-	fmt.Println("Updating card: nodeId=", input.NodeID)
+	slog.InfoContext(ctx, "update card fields received", "node_id", input.NodeID, "fields_count", len(input.Values))
 	for _, f := range input.Values {
-		fmt.Printf("  field: %s = %s\n", f.FieldID, f.Value)
+		slog.DebugContext(ctx, "update card field", "field_id", f.FieldID, "value", f.Value)
 	}
 
 	return &model.UpdateFieldsValuesPayload{
@@ -42,23 +42,3 @@ func (r *mutationResolver) UpdateFieldsValues(ctx context.Context, input model.U
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
 type mutationResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-/*
-	func (r *mutationResolver) UpdateCard(ctx context.Context, input model.UpdateCardInput) (*model.UpdateCardPayload, error) {
-	fmt.Println("Updating card: id=", input.ID)
-	for _, f := range input.FieldsAttributes {
-		fmt.Printf("  field: %s = %s\n", f.FieldID, f.FieldValue)
-	}
-	return &model.UpdateCardPayload{
-		Card: &model.CreatedCard{
-			Title: "Updated Card",
-		},
-	}, nil
-}
-*/

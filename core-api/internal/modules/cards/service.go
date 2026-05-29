@@ -2,7 +2,7 @@ package cards
 
 import (
 	"context"
-	"fmt"
+	"log/slog"
 
 	"core-api/internal/providers/pipefy"
 	pkg "core-api/packages"
@@ -23,27 +23,31 @@ func NewService(pool *pgxpool.Pool, pipefySvc pipefy.Provider) *Service {
 }
 
 func (s *Service) UpdateCard(ctx context.Context, dto *CardUpdateDto) error {
+	logger := pkg.Logger(ctx)
+
 	alreadyRegisteredEvents, err := s.repository.GetEventsByClientEmail(ctx, dto.ClientMail)
 	if err != nil {
+		logger.Error("fetch events failed", "client_email", dto.ClientMail, "error", err)
 		return err
 	}
 
 	for _, event := range alreadyRegisteredEvents {
 		if event.EventID == dto.EventID {
-			fmt.Printf("event with ID %s already registered\n", dto.EventID)
+			slog.WarnContext(ctx, "duplicate event skipped", "event_id", dto.EventID, "client_email", dto.ClientMail)
 			return nil
 		}
 	}
 
 	registeredEvent, err := s.repository.RegisterEvent(ctx, dto)
 	if err != nil {
+		logger.Error("register event failed", "event_id", dto.EventID, "client_email", dto.ClientMail, "error", err)
 		return err
 	}
-
-	fmt.Printf("registered event: %+v\n", registeredEvent)
+	logger.Info("event registered", "event_id", registeredEvent.EventID, "card_id", registeredEvent.CardID)
 
 	client, err := s.repository.GetClientByEmail(ctx, dto.ClientMail)
 	if err != nil {
+		logger.Error("fetch client failed", "client_email", dto.ClientMail, "error", err)
 		return err
 	}
 
@@ -51,6 +55,7 @@ func (s *Service) UpdateCard(ctx context.Context, dto *CardUpdateDto) error {
 	if pkg.CentsToDouble(client.Amount) >= 200000 {
 		priority = "HIGH"
 	}
+	logger.Info("priority resolved", "client_email", dto.ClientMail, "priority", priority)
 
 	if err := s.pipefy.UpdateCardFields(ctx, &pipefy.UpdateCardDto{
 		NodeId: dto.CardID,
@@ -59,16 +64,16 @@ func (s *Service) UpdateCard(ctx context.Context, dto *CardUpdateDto) error {
 			{FieldId: "status", Value: "Processado"},
 		},
 	}); err != nil {
+		logger.Error("pipefy update card failed", "card_id", dto.CardID, "error", err)
 		return err
 	}
 
-	updatedClient, err := s.repository.UpdateClientStatus(ctx, dto.ClientMail, "PROCESSED")
-	if err != nil {
+	if _, err := s.repository.UpdateClientStatus(ctx, dto.ClientMail, "PROCESSED"); err != nil {
+		logger.Error("update client status failed", "client_email", dto.ClientMail, "error", err)
 		return err
 	}
 
-	fmt.Printf("updated client status to PROCESSED: %+v\n", updatedClient)
-	fmt.Printf("retrieved client: %+v\n", client)
+	logger.Info("client status updated", "client_email", dto.ClientMail, "status", "PROCESSED")
 
 	return nil
 }

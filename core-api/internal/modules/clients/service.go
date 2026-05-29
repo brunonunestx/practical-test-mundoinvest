@@ -27,11 +27,13 @@ func NewClientService(pool *pgxpool.Pool, pipefy pipefy.Provider) *ClientService
 }
 
 func (s *ClientService) CreateClient(ctx context.Context, dto *CreateClientDto) (*Client, error) {
-	priority := "LOW"
+	logger := pkg.Logger(ctx)
 
+	priority := "LOW"
 	if dto.Value > 200000 {
 		priority = "HIGH"
 	}
+	logger.Info("priority assigned", "email", dto.Email, "priority", priority, "value", dto.Value)
 
 	createdUser, err := s.repository.CreateClient(ctx, &Client{
 		name:          dto.Name,
@@ -41,8 +43,10 @@ func (s *ClientService) CreateClient(ctx context.Context, dto *CreateClientDto) 
 		heritageValue: pkg.DoubleToCents(dto.Value),
 	})
 	if err != nil {
+		logger.Error("save client failed", "email", dto.Email, "error", err)
 		return nil, err
 	}
+	logger.Info("client saved", "email", dto.Email)
 
 	_, err = s.pipefy.CreateCard(ctx, &pipefy.CreateCardDto{
 		PipeId: s.pipeId,
@@ -57,8 +61,10 @@ func (s *ClientService) CreateClient(ctx context.Context, dto *CreateClientDto) 
 		},
 	})
 	if err != nil {
+		logger.Error("pipefy create card failed", "email", dto.Email, "error", err)
 		return nil, err
 	}
+	logger.Info("pipefy card created", "email", dto.Email)
 
 	return createdUser, nil
 }
