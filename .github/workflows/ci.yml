@@ -35,7 +35,9 @@ jobs:
 
       - name: Pin go directive for lint compatibility
         working-directory: core-api
-        run: go mod edit -go=1.24.0
+        run: |
+          go mod edit -go=1.24.0
+          go mod edit -toolchain=none
 
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
