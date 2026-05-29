@@ -9,7 +9,7 @@ import (
 )
 
 func (s *Server) RegisterRoutes() http.Handler {
-	clientsHandler := clients.NewClientHandler()
+	clientsHandler := clients.NewClientHandler(s.pool, s.pipefy)
 
 	r := mux.NewRouter()
 
@@ -22,7 +22,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 func (s *Server) corsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*") // When deploy to production, change this to the actual domain
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH")
 		w.Header().Set("Access-Control-Allow-Headers", "Accept, Authorization, Content-Type")
 		w.Header().Set("Access-Control-Allow-Credentials", "false")

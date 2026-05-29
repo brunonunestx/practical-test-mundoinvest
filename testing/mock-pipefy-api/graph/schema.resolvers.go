@@ -7,12 +7,18 @@ package graph
 
 import (
 	"context"
+	"fmt"
 
 	"mock-pipefy-api/graph/model"
 )
 
 // CreateCard is the resolver for the createCard field.
 func (r *mutationResolver) CreateCard(ctx context.Context, input model.CreateCardInput) (*model.CreateCardPayload, error) {
+	fmt.Printf("Creating card: pipeId=%d title=%s\n", input.PipeID, input.Title)
+	for _, f := range input.FieldsAttributes {
+		fmt.Printf("  field: %s = %s\n", f.FieldID, f.FieldValue)
+	}
+
 	return &model.CreateCardPayload{
 		Card: &model.CreatedCard{
 			Title: input.Title,

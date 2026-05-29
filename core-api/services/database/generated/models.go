@@ -103,7 +103,7 @@ type Client struct {
 	RequestType string
 	Status      RequestStatusEnum
 	Priority    PriorityEnum
-	Amount      pgtype.Numeric
 	CreatedAt   pgtype.Timestamptz
 	UpdatedAt   pgtype.Timestamptz
+	Amount      int32
 }

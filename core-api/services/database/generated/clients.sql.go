@@ -38,10 +38,22 @@ type CreateClientParams struct {
 	RequestType string
 	Status      RequestStatusEnum
 	Priority    PriorityEnum
-	Amount      pgtype.Numeric
+	Amount      int32
 }
 
-func (q *Queries) CreateClient(ctx context.Context, arg CreateClientParams) (Client, error) {
+type CreateClientRow struct {
+	ID          pgtype.UUID
+	Name        string
+	Email       string
+	RequestType string
+	Status      RequestStatusEnum
+	Priority    PriorityEnum
+	Amount      int32
+	CreatedAt   pgtype.Timestamptz
+	UpdatedAt   pgtype.Timestamptz
+}
+
+func (q *Queries) CreateClient(ctx context.Context, arg CreateClientParams) (CreateClientRow, error) {
 	row := q.db.QueryRow(ctx, createClient,
 		arg.Name,
 		arg.Email,
@@ -50,7 +62,7 @@ func (q *Queries) CreateClient(ctx context.Context, arg CreateClientParams) (Cli
 		arg.Priority,
 		arg.Amount,
 	)
-	var i Client
+	var i CreateClientRow
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
