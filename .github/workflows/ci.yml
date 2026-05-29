@@ -33,19 +33,12 @@ jobs:
         with:
           go-version-file: core-api/go.mod
 
-      - name: Pin go directive for lint compatibility
-        working-directory: core-api
-        run: go mod edit -go=1.24.0
+      - name: Install golangci-lint
+        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 
-      - name: Download dependencies
+      - name: Run golangci-lint
         working-directory: core-api
-        run: go mod download
-
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v6
-        with:
-          working-directory: core-api
-          version: latest
+        run: golangci-lint run ./...
 
   test:
     name: Test
